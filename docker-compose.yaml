@@ -1,0 +1,57 @@
+version: '3' # compose file syntax
+
+# actual containers (services)
+services:
+
+  mariadb:
+    container_name: test-mariadb
+    hostname: test-mariadb
+    image: docker-compose-example:mariadb
+    build:
+      context: ./mariadb
+      dockerfile: Dockerfile
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+    volumes:
+      - ./mariadb/initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "3307:3306"
+    networks:
+      - global
+
+  backend-server:
+    container_name: test-backend-server
+    hostname: test-backend-server
+    image: docker-compose-example:backend-server
+    build:
+      context: ./backend-server
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend-server/src:/src
+    ports:
+      - "7999:8000"
+    networks:
+      - global
+      - dev-backend
+
+  jupyter-server:
+    container_name: test-jupyter-server
+    hostname: test-jupyter-server
+    image: docker-compose-example:jupyter-server
+    build:
+      context: ./jupyter-server
+      dockerfile: Dockerfile
+    volumes:
+      - ./jupyter-server/src:/src
+    ports:
+      - "1000:8888"
+    networks:
+      - global
+      - data-backend
+
+
+networks:
+  global:
+  frontend:
+  dev-backend:
+  data-backend:
